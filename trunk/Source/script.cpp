@@ -3136,9 +3136,9 @@ int CEXEBuild::doCommand(int which_token, LineParser &line)
     case TOK_P_MAKENSIS:
       {
         const TCHAR *cmdname=get_commandtoken_name(which_token);
-        const TCHAR *exec=line.gettoken_str(1), *define;
+        const TCHAR *exec=line.gettoken_str(1), *define=0;
         int comp=line.gettoken_enum(2,_T("<\0>\0<>\0=\0ignore\0"));
-        int validparams=true, ret=-1, cmpv;
+        int validparams=true, ret=-1, cmpv=0;
         switch(line.getnumtokens()-1)
         {
         case 1: comp=4; break;
@@ -3154,7 +3154,7 @@ int CEXEBuild::doCommand(int which_token, LineParser &line)
           extern NStreamEncoding g_outputenc;
           TCHAR buf[33];
           compile=_T("\""), compile+=get_executable_path(g_argv0), compile+= _T("\"");
-          compile+= _T(" ") OPT_STR _T("v"), compile+=_itot(get_verbosity(),buf,10);
+          compile+= _T(" ") OPT_STR _T("v"), wsprintf(buf,_T("%d"),get_verbosity()), compile+=buf;
           compile+= _T(" ") OPT_STR _T("OCS "), g_outputenc.GetCPDisplayName(buf), compile+=buf;
           if (*exec) compile+= _T(" "), compile+=exec;
           exec=compile.c_str();
