@@ -10,11 +10,15 @@ Released on ?, 2014
 
 \b Added \R{makensis}{!makensis} command
 
+\b InitiateShutdown is used to reboot the machine if available (\W{http://sf.net/p/nsis/patches/247}{patch #247})
+
 \b Added PPO and SafePPO preprocess-only compiler switches
 
 \b MakeNSIS WM_COPYDATA messages now use the QH_OUTPUTCHARSET encoding with CP_ACP as the default for compatibility with old IDEs.
 
 \S2{} Minor Changes
+
+\b Added System::Call direct register memory access type. (\W{http://sf.net/p/nsis/patches/249}{patch #249})
 
 \b Fixed POSIX !searchparse bug (\W{http://sf.net/p/nsis/patches/251}{patch #251})
 
