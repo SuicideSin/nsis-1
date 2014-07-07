@@ -952,10 +952,6 @@ TCHAR* CEXEBuild::GetMacro(const TCHAR *macroname, TCHAR**macroend /*= 0*/)
   }
   return 0;
 }
-inline bool CEXEBuild::MacroExists(const TCHAR *macroname)
-{
-  return !!GetMacro(macroname);
-}
 
 int CEXEBuild::LoadLicenseFile(const TCHAR *file, TCHAR** pdata, const TCHAR *cmdname, WORD AnsiCP) // caller must free *pdata, even on error result
 {
@@ -1212,7 +1208,7 @@ int CEXEBuild::doCommand(int which_token, LineParser &line)
         }
         TCHAR *mbufb=(TCHAR*)m_macros.get();
         const unsigned int mcb=BUGBUG64TRUNCATE(unsigned int, (mend-mbeg)*sizeof(TCHAR)), mbufcb=m_macros.getlen();
-        memmove(mbeg,mend+sizeof(TCHAR),mbufcb-(mcb+(mbeg-mbufb)));
+        memmove(mbeg,mend+1,mbufcb-(mcb+(mbeg-mbufb)));
         m_macros.resize((int)(mbufcb-(mcb+sizeof(TCHAR))));
         SCRIPT_MSG(_T("!macroundef: %") NPRIs _T("\n"),mname);
       }
@@ -1256,22 +1252,20 @@ int CEXEBuild::doCommand(int which_token, LineParser &line)
             macroname,npr,line.getnumtokens()-2);
           return PS_ERROR;
         }
-
-        int lp=0;
-        TCHAR str[1024];
-        if (m_macro_entry.find(macroname,0)>=0)
+        static unsigned char insertmacrorecursion=0;
+        if (++insertmacrorecursion > MAX_MACRORECURSION)
         {
-          ERROR_MSG(_T("!insertmacro: macro \"%") NPRIs _T("\" already being inserted!\n"),macroname);
+          ERROR_MSG(_T("!insertmacro: insert depth is limited to %u macros!\n"),MAX_MACRORECURSION);
           return PS_ERROR;
         }
-        int npos=m_macro_entry.add(macroname,0);
-
         const bool oldparserinsidecomment=inside_comment;
         inside_comment=false; // "!insertmacro foo /*" does not mean that the macro body is a comment
+        TCHAR str[1024];
         wsprintf(str,_T("macro:%") NPRIs,macroname);
-        const TCHAR* oldmacroname=m_currentmacroname;
+        const TCHAR *oldmacroname=m_currentmacroname;
         m_currentmacroname=macroname;
         definedlist.set(_T("__MACRO__"),m_currentmacroname);
+        int lp=0;
         while (*t)
         {
           lp++;
@@ -1291,7 +1285,6 @@ int CEXEBuild::doCommand(int which_token, LineParser &line)
           }
           t+=_tcslen(t)+1;
         }
-        m_macro_entry.delbypos(npos);
         {
           TCHAR *p=(TCHAR*)l_define_names.get();
           while (*p)
@@ -1304,8 +1297,9 @@ int CEXEBuild::doCommand(int which_token, LineParser &line)
         }
         definedlist.del(_T("__MACRO__"));
         m_currentmacroname=oldmacroname;
-        inside_comment=oldparserinsidecomment;
         if (oldmacroname) definedlist.add(_T("__MACRO__"),oldmacroname);
+        inside_comment=oldparserinsidecomment;
+        --insertmacrorecursion;
         SCRIPT_MSG(_T("!insertmacro: end of %") NPRIs _T("\n"),macroname);
       }
     return PS_OK;

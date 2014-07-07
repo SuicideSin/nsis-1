@@ -8,6 +8,8 @@ Released on ?, 2014
 
 \S2{} Major Changes
 
+\b !insertmacro allows macro recursion (\W{http://sf.net/p/nsis/feature-requests/497}{RFE #497})
+
 \b Added \R{makensis}{!makensis} command
 
 \b InitiateShutdown is used to reboot the machine if available (\W{http://sf.net/p/nsis/patches/247}{patch #247})
@@ -21,6 +23,8 @@ Released on ?, 2014
 \b Added System::Call direct register memory access type. (\W{http://sf.net/p/nsis/patches/249}{patch #249})
 
 \b Fixed POSIX !searchparse bug (\W{http://sf.net/p/nsis/patches/251}{patch #251})
+
+\b Fixed !macroundef
 
 \S2{} Translations
 
@@ -95,8 +99,6 @@ It's the holiday gift you've been waiting for!
 \b Fixed !define Unicode null terminator bug (\W{http://sf.net/p/nsis/bugs/1079/}{bug #1079})
 
 \b Unicode stubs create WCHAR richedit controls (\W{http://sf.net/p/nsis/bugs/1080/}{bug #1080})
-
-\b Fixed !macroundef
 
 \b Fixed MakeNSISW default pushbutton and tab order
 
